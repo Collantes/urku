@@ -17,15 +17,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import upeu.edu.pe.urku.entity.Usuario;
 import upeu.edu.pe.urku.repository.UsuarioRepository;
+import upeu.edu.pe.urku.service.UsuarioService;
 
 /**
  *
  * @author tpp
  */
 @Service
-public class UsuarioServiceImpl implements UserDetailsService {
+public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
 
     private final Logger logger = LoggerFactory.getLogger(UsuarioServiceImpl.class);
 
@@ -33,6 +35,7 @@ public class UsuarioServiceImpl implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByUsername(username);
 
@@ -50,4 +53,9 @@ public class UsuarioServiceImpl implements UserDetailsService {
         return new User(usuario.getUsername(), usuario.getPassword(), usuario.getEnabled(), true, true, true, authorities);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario findByUsername(String username) {
+        return usuarioRepository.findByUsername(username);
+    }
 }
